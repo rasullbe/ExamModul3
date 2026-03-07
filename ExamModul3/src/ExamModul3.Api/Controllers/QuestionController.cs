@@ -9,7 +9,7 @@ namespace ExamModul3.Api.Controllers;
 public class QuestionController : ControllerBase
 {
     private readonly IQuestionService PostService;
-    public PostsController()
+    public QuestionController()
     {
         QuestionService = new QuestionService();
     }
@@ -20,5 +20,5 @@ public class QuestionController : ControllerBase
         return QuestionService.AddQuestion(postCreateDto);
     }
 
-
+    
 }

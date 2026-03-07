@@ -51,6 +51,19 @@ public class QuestionService : IQuestionService
 
     public bool UpgradeQuestion(Guid questionId, QuestionCreateDto questionCreateDto)
     {
-        throw new NotImplementedException();
+        var questions = QuestionRepository.GetAllQuestion();
+
+        foreach (var question in questions)
+        {
+            if (question.QuestionId == questionId)
+            {
+                question.Title = questionCreateDto.Title;
+                question.Content = questionCreateDto.Content;
+                QuestionRepository.SaveAllQuestions(questions);
+                return true;
+            }
+        }
+
+        return false;
     }
 }
