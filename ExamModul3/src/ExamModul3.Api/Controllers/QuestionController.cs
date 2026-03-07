@@ -4,20 +4,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ExamModul3.Api.Controllers;
 
-[Route("api/qiestions")]
+[Route("api/questions")]
 [ApiController]
 public class QuestionController : ControllerBase
 {
-    private readonly IQuestionService PostService;
-    public QuestionController()
+    private readonly IQuestionService _questionService;
+    public QuestionController(IQuestionService questionService)
     {
-        QuestionService = new QuestionService();
+        _questionService = questionService;
     }
 
     [HttpPost("add")]
     public Guid Create(QuestionCreateDto postCreateDto, string token)
     {
-        return QuestionService.AddQuestion(postCreateDto);
+        return _questionService.AddQuestion(postCreateDto);
     }
 
     

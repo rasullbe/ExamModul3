@@ -6,10 +6,10 @@ namespace ExamModul3.Api.Services;
 
 public class QuestionService : IQuestionService
 {
-    private readonly IQuestionRepository PostRepository;
-    public PostService()
+    private readonly IQuestionRepository _questionRepository;
+    public QuestionService(IQuestionRepository questionRepository)
     {
-        QuestionRepository = new UserRepository();
+        _questionRepository = questionRepository;
     }
     public Guid AddQuestion(QuestionCreateDto questionCreateDto)
     {
@@ -22,48 +22,69 @@ public class QuestionService : IQuestionService
             VariantC = questionCreateDto.VariantC,
             Answer = questionCreateDto.Answer
         };
+
+        var questions = _questionRepository.GetAllQuestion() ?? new List<Question>();
+        questions.Add(question);
+        _questionRepository.SaveAllQuestions(questions);
+
+        return question.QuestionId;
     }
 
     public bool DeleteQuestion(Guid questionId)
     {
-        var questions = QuestionRepository.GetAllQuestion();
-        foreach (var question in questions)
+        var questions = _questionRepository.GetAllQuestion();
+        var questionToRemove = questions?.FirstOrDefault(q => q.QuestionId == questionId);
+
+        if (questionToRemove != null)
         {
-            if (question.QuestionId == questionId)
-            {
-                questions.Remove(question);
-                QuestionRepository.SaveAllQuestions(questions);
-                return true;
-            }
+            questions.Remove(questionToRemove);
+            _questionRepository.SaveAllQuestions(questions);
+            return true;
         }
         return false;
     }
 
     public int GetCountOfQuestions()
     {
-        throw new NotImplementedException();
+        var questions = _questionRepository.GetAllQuestion();
+        return questions?.Count ?? 0;
     }
 
     public QuestionGetDto GetRandomQuestion()
     {
-        throw new NotImplementedException();
+        var questions = _questionRepository.GetAllQuestion();
+        if (questions == null || questions.Count == 0)
+            return null;
+
+        var random = new Random();
+        var randomQuestion = questions[random.Next(questions.Count)];
+
+        return new QuestionGetDto
+        {
+            QuestionId = randomQuestion.QuestionId,
+            Text = randomQuestion.Text,
+            VariantA = randomQuestion.VariantA,
+            VariantB = randomQuestion.VariantB,
+            VariantC = randomQuestion.VariantC
+        };
     }
 
     public bool UpgradeQuestion(Guid questionId, QuestionCreateDto questionCreateDto)
     {
-        var questions = QuestionRepository.GetAllQuestion();
+        var questions = _questionRepository.GetAllQuestion();
+        var question = questions?.FirstOrDefault(q => q.QuestionId == questionId);
 
-        foreach (var question in questions)
+        if (question != null)
         {
-            if (question.QuestionId == questionId)
-            {
-                question.Title = questionCreateDto.Title;
-                question.Content = questionCreateDto.Content;
-                QuestionRepository.SaveAllQuestions(questions);
-                return true;
-            }
-        }
+            question.Text = questionCreateDto.Text;
+            question.VariantA = questionCreateDto.VariantA;
+            question.VariantB = questionCreateDto.VariantB;
+            question.VariantC = questionCreateDto.VariantC;
+            question.Answer = questionCreateDto.Answer;
 
+            _questionRepository.SaveAllQuestions(questions);
+            return true;
+        }
         return false;
     }
 }
