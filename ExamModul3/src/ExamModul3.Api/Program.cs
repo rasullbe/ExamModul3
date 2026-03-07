@@ -31,6 +31,8 @@ namespace ExamModul3.Api
             app.MapControllers();
 
             app.Run();
+            
+
         }
     }
 }
